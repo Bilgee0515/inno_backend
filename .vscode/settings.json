@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./inno_vehicle_register/xyp-client-code-python-main",
+        "./inno_vehicle_register/xypClient"
+    ]
+}
