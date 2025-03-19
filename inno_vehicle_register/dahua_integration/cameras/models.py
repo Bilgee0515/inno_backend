@@ -51,6 +51,11 @@ class BufferTable(models.Model):
   timestamp = models.DateTimeField()
   status = models.CharField(max_length=100, default='not processed')
 
+class VehicleInfoByExc(models.Model):
+  location = models.CharField(max_length=255)
+  camera_direction = models.IntegerField()
+  plate_number = models.CharField(max_length=255)
+  timestamp = models.DateTimeField()
 
 class User(models.Model):
   username = models.CharField(max_length=20, null=False)

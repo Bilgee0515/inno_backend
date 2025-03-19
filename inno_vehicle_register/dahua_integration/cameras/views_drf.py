@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import TemplateView
-from .models import Camera, Vehicle
+from .models import Camera, Vehicle, VehicleInfoByExc
 from NetSDK.NetSDK import NetClient
 from NetSDK.SDK_Struct import *
 from NetSDK.SDK_Enum import *
@@ -257,6 +257,25 @@ def serialize_object(obj):
         'vehicletype': obj.get('vehicletype'),
     }
 
+# class FileUploadView(APIView):
+#     parser_classes = [MultiPartParser]
+
+#     def post(self, request, *args, **kwargs):
+#         file = request.FILES.get('file')
+#         if not file:
+#             return Response({"error": "No file uploaded"}, status=400)
+
+#         try:
+#             # Read the Excel file using pandas
+#             data = pd.read_excel(file)
+#             # Perform operations with `data`
+#             print(data.head())  # Example: print the first few rows
+
+#             return Response({"message": "File processed successfully!"})
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=500)
+
+
 class FileUploadView(APIView):
     parser_classes = [MultiPartParser]
 
@@ -267,11 +286,37 @@ class FileUploadView(APIView):
 
         try:
             # Read the Excel file using pandas
-            data = pd.read_excel(file)
-            # Perform operations with `data`
-            print(data.head())  # Example: print the first few rows
+            data = pd.read_excel(file, dtype={'platenumber': str})
 
-            return Response({"message": "File processed successfully!"})
+            # Rename columns to match model fields
+            data.rename(columns={
+                "timestamp": "timestamp",
+                "location": "location",
+                "camera direction": "camera_direction",
+                "platenumber": "plate_number"
+            }, inplace=True)
+
+            # Convert timestamp to proper format
+            data['timestamp'] = pd.to_datetime(data['timestamp'], errors='coerce')
+
+            # Drop rows where timestamp conversion failed
+            data = data.dropna(subset=['timestamp'])
+
+            # Convert to model objects
+            vehicle_objects = [
+                VehicleInfoByExc(
+                    timestamp=row['timestamp'],
+                    location=row['location'],
+                    camera_direction=int(row['camera_direction']),
+                    plate_number=row['plate_number']
+                ) for _, row in data.iterrows()
+            ]
+
+            # Bulk insert
+            VehicleInfoByExc.objects.bulk_create(vehicle_objects)
+
+            return Response({"message": "File processed and data saved successfully!"}, status=201)
+
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 

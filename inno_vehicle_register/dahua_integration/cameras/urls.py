@@ -19,5 +19,5 @@ urlpatterns = [
     path('add_buffer/', AddBufferTableView.as_view(), name='add-buffer'),
     path('daily_report/', GetDailyReportAllCamView.as_view(), name='get-daily-all-cam'),
     path('add_vehicle/', PostVehicleInfoView.as_view(), name='add-vehicle'),
-    # path('upload', FileUploadView.as_view(), name='file-upload'),
+    path('upload/', FileUploadView.as_view(), name='file-upload'),
 ]
