@@ -374,10 +374,10 @@ class GetDailyReportView(TemplateView):
             # return test
             if request.method == 'GET':
                 # Get the selected date from the form submission
-                # selected_date_str = request.data.get('selected_date')
-                # selected_camera = request.data.get('selected_camera')
-                selected_date_str = '2024-02-13'
-                selected_camera = 17
+                selected_date_str = request.data.get('selected_date')
+                selected_camera = request.data.get('selected_camera')
+                # selected_date_str = '2024-02-13'
+                # selected_camera = 17
 
                 # Result is given within List with dict. timerange as keys and values are count
                 result_list = get_daily_count_list(selected_date_str, selected_camera)
@@ -444,7 +444,7 @@ class GetDailyReportAllCamView(TemplateView):
             # return test
             if request.method == 'GET':
                 # Get the selected date from the form submission
-                # selected_date_str = request.data.get('selected_date')
+                selected_date_str = request.data.get('selected_date')
                 # selected_camera = request.data.get('selected_camera')
 
                 # Get all the cameras from the DB
@@ -455,10 +455,10 @@ class GetDailyReportAllCamView(TemplateView):
                     cam_id = camera['id']
                     cam_ids.append(cam_id)
 
-                selected_date_str = '2024-02-13'
+                # selected_date_str = '2024-02-13'
                 for cam_id in cam_ids:
-                    # selected_camera = cam_id
-                    selected_camera = 17
+                    selected_camera = cam_id
+                    # selected_camera = 17
 
                     # Result is given within List of dict. list elements start from type 1 vehicle to type 9 vehicle.
                     result_list = get_daily_count_list(selected_date_str, selected_camera)
@@ -481,6 +481,9 @@ class GetDailyReportAllCamView(TemplateView):
         except Exception as e:
             # Handle exceptions and return an error response
             return Response({"error": f"Error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# class GetDashboardInfoView(APIView):
+#     def get()
 
 
 class PostVehicleInfoView(APIView):
